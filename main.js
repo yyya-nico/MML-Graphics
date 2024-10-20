@@ -142,56 +142,65 @@ class CanvasImageBackupper {
   }
 }
 const imageBackup = new CanvasImageBackupper(canvas, ctx);
-canvas.addEventListener('pointerenter', () => {
-  imageBackup.backup();
-});
 
 class Point {
-  constructor(x, y) {
+  #diff = 4;
+
+  constructor(ctx, x, y) {
+    this.ctx = ctx;
     this.x = x;
     this.y = y;
     this.put();
   }
+  
 
   put() {
-    const diff = 4;
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y - diff);
-    ctx.lineTo(this.x + diff, this.y);
-    ctx.lineTo(this.x, this.y + diff);
-    ctx.lineTo(this.x - diff, this.y);
-    ctx.closePath();
-    ctx.fill();
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x, this.y - this.#diff);
+    this.ctx.lineTo(this.x + this.#diff, this.y);
+    this.ctx.lineTo(this.x, this.y + this.#diff);
+    this.ctx.lineTo(this.x - this.#diff, this.y);
+    this.ctx.closePath();
+    this.ctx.fill();
   }
 
   rewrite(x, y) {
-    this.x = x;
-    this.y = y;
+    this.x = x ?? this.x;
+    this.y = y ?? this.y;
     this.put();
+  }
+
+  hoverJudge(x, y) {
+    return Math.abs(x - this.x) + Math.abs(y - this.y) <= this.#diff;
   }
 }
 
+const points = [
+  new Point(ctx, 10, 10),
+  new Point(ctx, 30, 10),
+  new Point(ctx, 50, 10),
+  new Point(ctx, 70, 30),
+];
+
 let pointerPressed = false;
+let dragging = false;
+let working = null;
 const pointerHandler = e => {
   if (!e.isPrimary) {
     return;
   }
   console.log(e.type);
   
-  imageBackup.restore();
   switch (e.type) {
     case 'pointerenter':
       e.target.setPointerCapture(e.pointerId);
       break;
 
     case 'pointermove':
-      if (!pointerPressed) {
-        return
-      }
       break;
 
     case 'pointerdown':
-      pointerPressed = true;      
+      pointerPressed = true;
       break;
 
     case 'pointerup':
@@ -200,7 +209,28 @@ const pointerHandler = e => {
       return;
   }
   const {offsetX: x, offsetY: y} = e;
-  new Point(x, y);
+  const hovered = points.find(point => point.hoverJudge(x, y));
+  if (dragging || working || hovered) {
+    if (pointerPressed) {
+      dragging = true;
+      working ??= hovered;
+      canvas.style.cursor = 'move';
+      imageBackup.restore();
+      points.forEach(point => {
+        if (point === working) {
+          point.rewrite(x, y);
+          return;
+        }
+        point.rewrite();
+      });
+      return;
+    }
+    dragging = false;
+    working = null;
+    canvas.style.cursor = 'pointer';
+    return;
+  }
+  canvas.style.cursor = '';
 };
 
 [
