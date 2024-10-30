@@ -254,6 +254,7 @@ media.addEventListener('change', e => {
   ctx.strokeStyle = currentColor
   genGrid('center');
   drawSineWave();
+  imageBackup.backup();
   points.forEach(point => {
     point.rewrite();
   });
