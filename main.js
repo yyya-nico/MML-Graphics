@@ -48,7 +48,7 @@ const inputRange = (i => {
 const ctx = canvas.getContext('2d', {
   willReadFrequently: true,
 });
-const currentColor = getComputedStyle(canvas).color;
+let currentColor = getComputedStyle(canvas).color;
 ctx.fillStyle = currentColor
 ctx.strokeStyle = currentColor
 
@@ -242,3 +242,15 @@ const pointerHandler = e => {
 ].forEach(type => 
   canvas.addEventListener(type, pointerHandler)
 );
+
+const media = window.matchMedia('(prefers-color-scheme: dark)')
+media.addEventListener('change', e => {
+  currentColor = getComputedStyle(canvas).color;
+  ctx.fillStyle = currentColor
+  ctx.strokeStyle = currentColor
+  genGrid('center');
+  drawSineWave();
+  points.forEach(point => {
+    point.rewrite();
+  });
+});
