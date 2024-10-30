@@ -253,7 +253,7 @@ media.addEventListener('change', e => {
   ctx.fillStyle = currentColor
   ctx.strokeStyle = currentColor
   genGrid('center');
-  drawSineWave();
+  drawSineWave(inputRange.input.valueAsNumber);
   imageBackup.backup();
   points.forEach(point => {
     point.rewrite();
