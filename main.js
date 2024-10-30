@@ -1,6 +1,6 @@
 import './style.scss'
 
-import {htmlspecialchars} from './utils';
+import { htmlspecialchars } from './utils';
 
 const app = document.body;
 
@@ -123,6 +123,9 @@ const drawSineWave = (period = 1) => {
 inputRange.input.addEventListener('input', e => {
   drawSineWave(e.target.valueAsNumber);
   inputRange.label.textContent = e.target.value;
+  points.forEach(point => {
+    point.rewrite();
+  });
 });
 drawSineWave();
 
@@ -206,7 +209,7 @@ const pointerHandler = e => {
     case 'pointerup':
       pointerPressed = false;
     case 'pointerleave':
-      return;
+      break;
   }
   const {offsetX: x, offsetY: y} = e;
   const hovered = points.find(point => point.hoverJudge(x, y));
