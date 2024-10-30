@@ -133,23 +133,6 @@ const genGrid = ref => {
 };
 genGrid('center');
 
-class CanvasImageBackupper {
-  constructor(canvas, ctx) {
-    this.canvas = canvas;
-    this.ctx = ctx;
-    this.backup();
-  }
-
-  backup() {
-    this.imageBackup = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  restore() {
-    this.ctx.putImageData(this.imageBackup, 0, 0);
-  }
-}
-const imageBackup = new CanvasImageBackupper(canvas, ctx);
-
 const drawSineWave = (period = 1) => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   genGrid('center');
@@ -172,6 +155,25 @@ const drawSineWave = (period = 1) => {
   ctx.stroke();
   ctx.strokeStyle = currentColor;
 };
+drawSineWave();
+
+class CanvasImageBackupper {
+  constructor(canvas, ctx) {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.backup();
+  }
+
+  backup() {
+    this.imageBackup = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  restore() {
+    this.ctx.putImageData(this.imageBackup, 0, 0);
+  }
+}
+
+const imageBackup = new CanvasImageBackupper(canvas, ctx);
 
 inputRange.input.addEventListener('input', e => {
   drawSineWave(e.target.valueAsNumber);
@@ -181,7 +183,6 @@ inputRange.input.addEventListener('input', e => {
     point.rewrite();
   });
 });
-drawSineWave();
 
 class Point {
   #diff = 4;
