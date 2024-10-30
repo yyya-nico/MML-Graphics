@@ -10,6 +10,15 @@ const appendNew = (tagName, attrs = {}, appendTarget = app) => {
   return appendTarget.appendChild(elem);
 };
 
+const appendOptions = (def = {}, appendTarget = app) => {
+  Object.entries(def).forEach(([value, text]) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      appendTarget.appendChild(option);
+  });
+}
+
 const canvas = appendNew('canvas', {
   width: 400,
   height: 200
@@ -31,6 +40,33 @@ const toneColor = (t => {
 })({});
 
 toneColor.print('@V100 @3@W50 @E1,0,60,30,1 @E2,0,30,0,127');
+
+const waveSelect = (w => {
+  w.div = appendNew('div');
+  w.select = appendNew('select', {}, w.div);
+  appendOptions({
+    '@0': '@0 正弦波',
+    '@0-1': '@0-1 半波整流正弦波',
+    '@0-2': '@0-2 全波整流正弦波',
+    '@1': '@1 ノコギリ波',
+    '@1-1': '@1-1 ノコギリ波(変位0から)',
+    '@2': '@2 三角波',
+    '@2-1': '@2-1 三角波(変位0から)',
+    '@3': '@3 パルス波',
+    '@4': '@4 ホワイトノイズ',
+    '@5': '@5 FCパルス波',
+    '@6': '@6 FC三角波',
+    '@7': '@7 FCノイズ',
+    '@8': '@8 FCショートノイズ',
+    '@9': '@9 FC DPCM',
+    '@10': '@10 GB波形メモリ音源',
+    '@11': '@11 GBノイズ',
+    '@12': '@12 GBショートノイズ',
+    '@13': '@13 波形メモリ音源',
+    '@14': '@14 FM音源'
+  }, w.select);
+  return w;
+})({});
 
 const inputRange = (i => {
   i.div = appendNew('div');
