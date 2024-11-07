@@ -148,7 +148,7 @@ const drawSineWave = (period = 1) => {
   //グラフ描画
   ctx.strokeStyle = '#00ff00';
   ctx.beginPath();
-  for(let x = 0; x < canvas.width; x++){ 
+  for(let x = 0; x < canvas.width; x++){
     let y = sineWave(x);
     ctx.lineTo(x, y);
   }
@@ -193,7 +193,7 @@ class Point {
     this.y = y;
     this.put();
   }
-  
+
 
   put() {
     this.ctx.beginPath();
@@ -206,13 +206,19 @@ class Point {
   }
 
   rewrite(x, y) {
-    this.x = x ?? this.x;
-    this.y = y ?? this.y;
+    if (this.inRangeJudge(x, y)) {
+      this.x = x;
+      this.y = y;
+    }
     this.put();
   }
 
   hoverJudge(x, y) {
     return Math.abs(x - this.x) + Math.abs(y - this.y) <= this.#diff;
+  }
+
+  inRangeJudge(x, y) {
+    return x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height;
   }
 }
 
@@ -231,7 +237,7 @@ const pointerHandler = e => {
     return;
   }
   console.log(e.type);
-  
+
   switch (e.type) {
     case 'pointerenter':
       e.target.setPointerCapture(e.pointerId);
@@ -280,7 +286,7 @@ const pointerHandler = e => {
   'pointermove',
   'pointerup',
   'pointerleave'
-].forEach(type => 
+].forEach(type =>
   canvas.addEventListener(type, pointerHandler)
 );
 
