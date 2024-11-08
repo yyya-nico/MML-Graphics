@@ -240,13 +240,13 @@ const pointerHandler = e => {
 
   switch (e.type) {
     case 'pointerenter':
-      e.target.setPointerCapture(e.pointerId);
       break;
 
     case 'pointermove':
       break;
 
     case 'pointerdown':
+      e.target.setPointerCapture(e.pointerId);
       pointerPressed = true;
       break;
 
