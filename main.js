@@ -206,19 +206,13 @@ class Point {
   }
 
   rewrite(x, y) {
-    if (this.inRangeJudge(x, y)) {
-      this.x = x;
-      this.y = y;
-    }
+    if (x) this.x = Math.min(Math.max(x, 0), canvas.width);
+    if (y) this.y = Math.min(Math.max(y, 0), canvas.height);
     this.put();
   }
 
   hoverJudge(x, y) {
     return Math.abs(x - this.x) + Math.abs(y - this.y) <= this.#diff;
-  }
-
-  inRangeJudge(x, y) {
-    return x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height;
   }
 }
 
