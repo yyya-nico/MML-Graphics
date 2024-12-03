@@ -148,8 +148,7 @@ const drawSineWave = (period = 1) => {
   //グラフ描画
   ctx.strokeStyle = '#00ff00';
   ctx.beginPath();
-  for(let x = 0; x < canvas.width; x++){
-    let y = sineWave(x);
+  for(let x = 0, y = sineWave(x); x < canvas.width; x++, y = sineWave(x)){
     ctx.lineTo(x, y);
   }
   ctx.stroke();
