@@ -109,7 +109,7 @@ const genGrid = ref => {
   ctx.lineWidth = 2;
   for (let n = 4, x = gridSize * n; x <= canvas.width; x += gridSize * n) {
     ctx.beginPath();
-    ctx.moveTo(x, 0            );
+    ctx.moveTo(x, 0);
     ctx.lineTo(x, canvas.height);
     ctx.stroke();
   }
@@ -178,23 +178,30 @@ inputRange.input.addEventListener('input', e => {
   drawSineWave(e.target.valueAsNumber);
   inputRange.label.textContent = e.target.value;
   imageBackup.backup();
+  drawPointsLine();
   points.forEach(point => {
-    point.rewrite();
+    point.write();
   });
 });
 
 class Point {
   #diff = 4;
 
-  constructor(ctx, x, y) {
+  constructor(ctx, x, y, options = {}) {
     this.ctx = ctx;
     this.x = x;
     this.y = y;
-    this.put();
+    this.options = options;
+    if (options.draggable === false) {
+      return;
+    }
+    this.write();
   }
 
-
-  put() {
+  write() {
+    if (this.options.draggable === false) {
+      return;
+    }
     this.ctx.beginPath();
     this.ctx.moveTo(this.x, this.y - this.#diff);
     this.ctx.lineTo(this.x + this.#diff, this.y);
@@ -204,23 +211,47 @@ class Point {
     this.ctx.fill();
   }
 
-  rewrite(x, y) {
+  get pos() {
+    return {x: this.x, y: this.y};
+  }
+
+  set pos({x, y}) {
     if (x) this.x = Math.min(Math.max(x, 0), canvas.width);
     if (y) this.y = Math.min(Math.max(y, 0), canvas.height);
-    this.put();
   }
 
   hoverJudge(x, y) {
+    if (this.options.draggable === false) {
+      return false;
+    }
     return Math.abs(x - this.x) + Math.abs(y - this.y) <= this.#diff;
   }
 }
 
+const hundredY = canvas.height / 2 % gridSize;
+const halfY = canvas.height / 2;
+
 const points = [
-  new Point(ctx, 10, 10),
-  new Point(ctx, 30, 10),
-  new Point(ctx, 50, 10),
-  new Point(ctx, 70, 30),
+  new Point(ctx, 0, halfY, { draggable: false }),
+  new Point(ctx, gridSize, hundredY),
+  new Point(ctx, gridSize * 2, hundredY + gridSize),
+  new Point(ctx, gridSize * 8, hundredY),
+  new Point(ctx, canvas.width, halfY, { draggable: false }),
 ];
+
+const drawPointsLine = () => {
+  ctx.strokeStyle = '#ffff00';
+  points.reduce((prev, point) => {
+    ctx.beginPath();
+    ctx.moveTo(prev.x, prev.y);
+    ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+    return point;
+  });
+  ctx.strokeStyle = currentColor;
+  points.forEach(point => point.write());
+};
+drawPointsLine();
 
 let pointerPressed = false;
 let dragging = false;
@@ -256,13 +287,9 @@ const pointerHandler = e => {
       working ??= hovered;
       canvas.style.cursor = 'move';
       imageBackup.restore();
-      points.forEach(point => {
-        if (point === working) {
-          point.rewrite(x, y);
-          return;
-        }
-        point.rewrite();
-      });
+      working.pos = {x, y};
+      drawPointsLine();
+      working.write();
       return;
     }
     dragging = false;
@@ -292,6 +319,6 @@ media.addEventListener('change', e => {
   drawSineWave(inputRange.input.valueAsNumber);
   imageBackup.backup();
   points.forEach(point => {
-    point.rewrite();
+    point.write();
   });
 });
