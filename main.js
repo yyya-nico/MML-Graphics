@@ -318,6 +318,7 @@ media.addEventListener('change', e => {
   genGrid('center');
   drawSineWave(inputRange.input.valueAsNumber);
   imageBackup.backup();
+  drawPointsLine();
   points.forEach(point => {
     point.write();
   });
